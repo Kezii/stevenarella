@@ -3,6 +3,8 @@ target/
 working/
 *.log
 pkg
+Cargo.lock
+**/*.rs.bk
 
 # IntelliJ
 .idea
