@@ -276,7 +276,7 @@ fn main2() {
     }
 
     let textures = renderer.get_textures();
-    let dpi_factor = window.window().current_monitor().hidpi_factor();
+    let dpi_factor = window.window().current_monitor().scale_factor();
     let default_protocol_version = protocol::versions::protocol_name_to_protocol_version(
         opt.default_protocol_version.unwrap_or("".to_string()));
     let mut game = Game {
@@ -312,12 +312,13 @@ fn main2() {
 
     let mut last_resource_version = 0;
     events_loop.run(move |event, _event_loop, control_flow| {
+        println!("{:?}", event);
         let now = Instant::now();
         let diff = now.duration_since(last_frame);
         last_frame = now;
         let delta = (diff.subsec_nanos() as f64) / frame_time;
         let (width, height) = window.window().inner_size().into();
-        let (physical_width, physical_height) = window.window().inner_size().to_physical(game.dpi_factor).into();
+        let (physical_width, physical_height) = window.window().inner_size().into();
 
         let version = {
             let try_res = game.resource_manager.try_write();
@@ -432,8 +433,8 @@ fn handle_window_event<T>(window: &mut glutin::WindowedContext<glutin::PossiblyC
         Event::WindowEvent{event, ..} => match event {
             WindowEvent::CloseRequested => game.should_close = true,
             WindowEvent::Resized(logical_size) => {
-                game.dpi_factor = window.window().hidpi_factor();
-                window.resize(logical_size.to_physical(game.dpi_factor));
+                game.dpi_factor = window.window().scale_factor();
+                window.resize(logical_size);
             },
 
             WindowEvent::ReceivedCharacter(codepoint) => {
